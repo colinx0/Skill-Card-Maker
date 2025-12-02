@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skill-Sharing QR Cards</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #4CAF50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    color: #fff;
+  }
+  h1 { text-align: center; }
+  form {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    margin-bottom: 20px;
+    width: 300px;
+    color: #000;
+  }
+  input, button {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+  .card {
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    margin-bottom: 20px;
+    width: 300px;
+    text-align: center;
+    color: #000;
+  }
+  canvas {
+    margin-top: 10px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Skill-Sharing QR Cards</h1>
+
+<div id="formContainer">
+  <form id="skillForm">
+    <input type="text" id="name" placeholder="Your Name" required />
+    <input type="text" id="skill" placeholder="Skill You Offer" required />
+    <input type="text" id="contact" placeholder="Contact Info (email, handle, etc.)" required />
+    <button type="submit">Create Card</button>
+  </form>
+</div>
+
+<div id="cardsContainer"></div>
+
+<!-- QRCode.js library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<script>
+const form = document.getElementById('skillForm');
+const container = document.getElementById('cardsContainer');
+
+// Helper to get URL params
+function getQueryParam(param) {
+  const params = new URLSearchParams(window.location.search);
+  return params.get(param);
+}
+
+// If visiting a card link, show the card
+const nameParam = getQueryParam('name');
+const skillParam = getQueryParam('skill');
+const contactParam = getQueryParam('contact');
+
+if (nameParam && skillParam && contactParam) {
+  document.getElementById('formContainer').style.display = 'none';
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <strong>${decodeURIComponent(nameParam)}</strong><br/>
+    Skill: ${decodeURIComponent(skillParam)}<br/>
+    Contact: ${decodeURIComponent(contactParam)}
+  `;
+  container.appendChild(card);
+} else {
+  // Normal form submission
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById('name').value;
+    const skill = document.getElementById('skill').value;
+    const contact = document.getElementById('contact').value;
+
+    // Build URL with encoded parameters
+    const url = `${window.location.pathname}?name=${encodeURIComponent(name)}&skill=${encodeURIComponent(skill)}&contact=${encodeURIComponent(contact)}`;
+
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <strong>${name}</strong><br/>
+      Skill: ${skill}<br/>
+      Contact: ${contact}<br/>
+      <div class="qrcode"></div>
+      <p>Scan QR to view this card online!</p>
+    `;
+
+    container.appendChild(card);
+
+    // Generate QR code linking to this card page
+    new QRCode(card.querySelector('.qrcode'), {
+      text: url,
+      width: 150,
+      height: 150,
+      colorDark : "#000000",
+      colorLight : "#ffffff",
+      correctLevel : QRCode.CorrectLevel.H
+    });
+
+    form.reset();
+  });
+}
+</script>
+
+</body>
+</html>

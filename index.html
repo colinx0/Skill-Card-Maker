@@ -98,9 +98,15 @@ if (nameParam && skillParam && contactParam) {
     const skill = document.getElementById('skill').value;
     const contact = document.getElementById('contact').value;
 
-    // Build URL with encoded parameters
-    const url = `${window.location.pathname}?name=${encodeURIComponent(name)}&skill=${encodeURIComponent(skill)}&contact=${encodeURIComponent(contact)}`;
+    // Encode parameters
+    const encodedName = encodeURIComponent(name);
+    const encodedSkill = encodeURIComponent(skill);
+    const encodedContact = encodeURIComponent(contact);
 
+    // Build QR URL
+    const url = `https://colinx0.github.io/Skill-Card-Maker/view.html?name=${encodedName}&skill=${encodedSkill}&contact=${encodedContact}`;
+
+    // Create card preview
     const card = document.createElement('div');
     card.className = 'card';
     card.innerHTML = `
@@ -113,14 +119,14 @@ if (nameParam && skillParam && contactParam) {
 
     container.appendChild(card);
 
-    // Generate QR code linking to this card page
+    // Generate QR code linking to clean view page
     new QRCode(card.querySelector('.qrcode'), {
       text: url,
       width: 150,
       height: 150,
-      colorDark : "#000000",
-      colorLight : "#ffffff",
-      correctLevel : QRCode.CorrectLevel.H
+      colorDark: "#000000",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.H
     });
 
     form.reset();
